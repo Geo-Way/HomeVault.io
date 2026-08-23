@@ -1,2 +1,0 @@
-# HomeVault.io
-Doc Manager
