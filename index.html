@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HomeVault - Documentos</title>
+    <style>
+        :root {
+            --primary: #4f46e5;        /* Azul lila profesional */
+            --primary-hover: #4338ca;  /* Azul lila oscuro */
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --border-color: #cbd5e1;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .login-background {
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* --- BOTÓN DE IDIOMA RESPONSIVE --- */
+        .lang-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+
+        .lang-btn {
+            background-color: #f1f5f9;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .lang-btn:hover {
+            background-color: #e2e8f0;
+            border-color: var(--primary);
+        }
+
+        h1, h2 {
+            color: var(--primary);
+            text-align: center;
+            margin-top: 0;
+        }
+
+        h1 { font-size: 1.5rem; }
+        h2 { font-size: 1.2rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; margin-top: 25px; }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        input[type="text"], input[type="password"], select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            background-color: #fff;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .file-upload-wrapper {
+            border: 2px dashed var(--border-color);
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            background-color: #fafafa;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .file-upload-wrapper:hover {
+            border-color: var(--primary);
+        }
+
+        .file-upload-wrapper input[type="file"] {
+            display: none;
+        }
+
+        .file-name {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #64748b;
+            word-break: break-all;
+        }
+
+        .error {
+            color: #ef4444;
+            font-size: 0.85rem;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Lista de documentos */
+        .doc-item {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .actions-group {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            flex: 1;
+            min-width: 70px;
+            padding: 6px 4px;
+            font-size: 0.75rem;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            text-align: center;
+            transition: background 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-red {
+            color: #dc2626;
+            border-color: #fca5a5;
+        }
+        .btn-red:hover {
+            background: #fee2e2;
+        }
+
+        /* Modal emergente para categorías */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body id="bodyTag" class="login-background">
+
+    <div class="container" id="loginCard">
+        <div class="lang-container">
+            <button class="lang-btn" onclick="toggleIdioma()">🌐 <span>DE / ES</span></button>
+        </div>
+        <h1 id="ui-login-title">Anmelden</h1>
+        <p id="ui-login-sub" style="text-align: center; color: #64748b; font-size: 0.9rem; margin-bottom: 20px;">Standard-PIN: 3172</p>
+        
+        <div class="form-group">
+            <input type="password" id="pinInput" placeholder="PIN eingeben" style="text-align: center; font-size: 1.2rem; letter-spacing: 3px;">
+        </div>
+        <button class="btn" id="ui-login-btn" onclick="verificarPin()">Einloggen</button>
+        <div id="errorLogin" class="error"></div>
+    </div>
+
+    <div class="container hidden" id="mainContent">
+        <div class="lang-container">
+            <button class="lang-btn" onclick="toggleIdioma()">🌐 <span>DE / ES</span></button>
+        </div>
+        
+        <h1 id="ui-title" style="color: var(--primary);">HomeVault</h1>
+
+        <h2 id="ui-path1-title">1️⃣ Neues Dokument hinzufügen</h2>
+        <div class="form-group">
+            <div class="file-upload-wrapper" onclick="document.getElementById('fileInput').click()">
+                <label id="ui-file-label" style="cursor: pointer; margin:0; color: #475569;">📷 Kamera / Scanner öffnen oder Datei wählen</label>
+                <input type="file" id="fileInput" accept="image/*,.pdf" capture="environment" onchange="actualizarNombreArchivo(this)">
+                <div id="fileNameDisplay" class="file-name"></div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label id="ui-cat-label" for="categorySelect">Kategorie wählen:</label>
+            <select id="categorySelect" onchange="verificarOpcionCategoria(this)">
+            </select>
+        </div>
+
+        <div class="form-group">
+            <textarea id="commentInput" placeholder="Kommentar (optional)..." rows="2"></textarea>
+        </div>
+
+        <button class="btn" id="ui-save-btn" onclick="guardarLocalmente()">Auf dem Handy speichern</button>
+
+        <h2 id="ui-path2-title" style="margin-top: 30px;">2️⃣ Dokumente verwalten & PC</h2>
+        <p id="ui-path2-desc" style="font-size: 0.85rem; color: #64748b; text-align: center;">Sehen, drucken, löschen oder an den PC senden.</p>
+        
+        <div id="listaDocs" style="margin-top: 15px; max-height: 350px; overflow-y: auto; padding-right: 4px;"></div>
+
+        <button class="btn" id="ui-sync-btn" onclick="sincronizarConPC()" style="margin-top: 15px; background-color: #3b82f6;">🔄 Mit PC synchronisieren</button>
+    </div>
+
+    <!-- Modal para crear categoría o subcategoría -->
+    <div id="categoryModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 id="modalTitle" style="color: var(--primary); margin-top:0;">Kategorie verwalten</h3>
+            
+            <div class="form-group">
+                <label id="modalTypeLabel" for="modalCreationType">Art:</label>
+                <select id="modalCreationType" onchange="cambiarModoModal()">
+                    <option value="main" id="optMain">📁 Neue Hauptkategorie (Hauptordner)</option>
+                    <option value="sub" id="optSub">📂 Unterkategorie zu bestehender</option>
+                </select>
+            </div>
+
+            <div class="form-group hidden" id="parentCategoryGroup">
+                <label id="modalParentLabel" for="modalParentSelect">Hauptkategorie wählen:</label>
+                <select id="modalParentSelect"></select>
+            </div>
+
+            <div class="form-group">
+                <label id="modalNameLabel" for="modalInputName">Name:</label>
+                <input type="text" id="modalInputName" placeholder="Name eingeben...">
+            </div>
+
+            <div class="modal-buttons">
+                <button class="action-btn" id="modalBtnCancel" onclick="cerrarModalCategoria()" style="background:#e2e8f0; padding:10px;">Abbrechen</button>
+                <button class="btn" id="modalBtnSave" onclick="guardarNuevaCategoriaModal()" style="padding:10px;">Erstellen</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
