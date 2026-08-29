@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title id="page-title">HomeVault - Simple Edition</title>
+  
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --accent: #0d9488;
+      --bg: #f1f5f9;
+      --card-bg: #ffffff;
+      --text: #0f172a;
+      --border: #cbd5e1;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background: var(--card-bg);
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+    .hidden { display: none !important; }
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+    h2 { margin: 0; color: var(--primary); font-size: 18px; }
+    .field { margin-bottom: 14px; }
+    label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; }
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 16px;
+      background: #fff;
+    }
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 6px;
+    }
+    button:active { opacity: 0.9; }
+    .nav-buttons {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .nav-buttons button { margin-top: 0; background: #475569; font-size: 13px; padding: 10px; }
+    .explorer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+      max-height: 50vh;
+      overflow-y: auto;
+    }
+    .explorer-card {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 100px;
+    }
+    .modal {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 16px;
+    }
+    .modal-content {
+      background: white; padding: 20px; border-radius: 12px; width: 100%; max-width: 400px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="top-header">
+      <h2>🔐 HomeVault</h2>
+      <select id="lang-select" onchange="changeLanguage(this.value)" style="padding:6px; border-radius:6px; border:1px solid var(--border);">
+        <option value="de">🇩🇪 Deutsch</option>
+        <option value="es" selected>🇪🇸 Español</option>
+      </select>
+    </div>
+
+    <!-- LOGIN / PIN -->
+    <div id="pin-screen" class="view">
+      <div class="field">
+        <label id="l-pin">Introduce tu PIN:</label>
+        <input type="password" id="pin-input" maxlength="4" placeholder="****" inputmode="numeric">
+      </div>
+      <button onclick="verifyPin()">Entrar</button>
+    </div>
+
+    <!-- APP PRINCIPAL -->
+    <div id="app-container" class="view hidden">
+      <div class="nav-buttons">
+        <button onclick="showView('scan-view')">📤 Nuevo</button>
+        <button onclick="showView('explore-view')">📁 Móvil</button>
+        <button onclick="showView('sync-view')">🔄 Sync PC</button>
+      </div>
+
+      <!-- VISTA 1: NUEVO DOCUMENTO -->
+      <div id="scan-view" class="view">
+        <div class="field">
+          <label>Carpeta / Categoría principal:</label>
+          <input type="text" id="cat-input" value="Gescannte Dokumente" placeholder="Ej. Gescannte Dokumente">
+        </div>
+
+        <div class="field">
+          <label>Subcarpeta (Opcional):</label>
+          <input type="text" id="subcat-input" placeholder="Ej. Facturas o déjalo vacío">
+        </div>
+
+        <div class="field">
+          <label>Archivo o Foto:</label>
+          <input type="file" id="file-input" capture="environment">
+        </div>
+
+        <div class="field">
+          <label>Nombre personalizado (Opcional):</label>
+          <input type="text" id="custom-name-input" placeholder="Nombre del archivo">
+        </div>
+
+        <div class="field">
+          <label>Comentario (Opcional):</label>
+          <textarea id="meta-comment" placeholder="Notas..."></textarea>
+        </div>
+
+        <button onclick="saveDocumentLocally()" style="background: var(--accent);">Guardar en el móvil</button>
+      </div>
+
+      <!-- VISTA 2: EXPLORADOR -->
+      <div id="explore-view" class="view hidden">
+        <button onclick="loadLocalExplorer()" style="background: var(--accent); margin-bottom:10px; width:auto; padding:8px 12px; font-size:13px;">🔄 Actualizar lista</button>
+        <div id="explorer-grid" class="explorer-grid"></div>
+      </div>
+
+      <!-- VISTA 3: SYNC PC -->
+      <div id="sync-view" class="view hidden">
+        <p style="font-size: 13px; color:#475569;">Envía tus archivos locales al PC y descarga los del ordenador.</p>
+        <div class="field">
+          <label>IP del PC:</label>
+          <input type="text" id="pc-ip-input" placeholder="192.168.1.50">
+        </div>
+        <button onclick="syncToPC()" style="background: var(--accent);">Sincronizar con el PC ahora</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DETALLES -->
+  <div id="file-details-modal" class="modal hidden">
+    <div class="modal-content">
+      <h3 id="modal-file-title" style="color: var(--primary); margin-top:0; word-break:break-all;">📄 Archivo</h3>
+      <p id="modal-file-comment" style="background: #f1f5f9; padding: 10px; border-radius: 6px; font-size: 13px; word-break:break-word;"></p>
+      <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 15px;">
+        <button onclick="viewCurrentDoc()" style="background: var(--accent); margin-top:0;">👁️ Ver / Abrir</button>
+        <button onclick="printCurrentDoc()" style="background: var(--primary); margin-top:0;">🖨️ Imprimir</button>
+        <button onclick="deleteCurrentDoc()" style="background: #dc2626; margin-top:0;">🗑️ Eliminar</button>
+        <button onclick="closeFileDetailsModal()" style="background: #64748b; margin-top:0;">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
