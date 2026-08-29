@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HomeVault</title>
+    <style>
+        :root { 
+            --primary: #2563eb;        
+            --primary-hover: #1d4ed8;  
+            --success: #059669; 
+            --danger: #dc2626; 
+            --warning: #d97706; 
+            --bg: #f4f4f9; 
+            --card-bg: #fff; 
+            --text: #333; 
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            margin: 0; 
+            padding: 15px; 
+            background: var(--bg); 
+            color: var(--text); 
+            box-sizing: border-box; 
+        }
+        
+        /* Fondo responsive con la casa perfectamente centrada */
+        body.login-background {
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('img/fondo.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container { max-width: 600px; margin: 0 auto; width: 100%; }
+        .card { background: var(--card-bg); padding: 20px; margin-bottom: 15px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        
+        /* Login semi-transparente, pequeño y seguro */
+        #loginCard {
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            max-width: 340px;
+            margin: 0 auto;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        h1, h3 { margin-top: 0; color: #1e3a8a; }
+        
+        button { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 12px; 
+            font-size: 1rem; 
+            border-radius: 6px; 
+            width: 100%; 
+            margin-top: 10px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            transition: background 0.2s;
+        }
+        button:hover { background: var(--primary-hover); }
+        button:active { opacity: 0.8; }
+        
+        .btn-green { background: var(--success); }
+        .btn-green:hover { background: #047857; }
+        
+        .btn-orange { background: var(--warning); }
+        .btn-orange:hover { background: #b45309; }
+        
+        .btn-red { background: var(--danger); font-size: 0.85rem; padding: 6px; width: auto; display: inline-block; margin-top: 5px; }
+        
+        input, textarea, select { width: 100%; padding: 12px; margin-top: 6px; margin-bottom: 12px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; font-size: 1rem; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
+
+        .section-path { border-top: 4px solid var(--primary); }
+        .section-path-green { border-top: 4px solid var(--success); }
+
+        .file-upload-label {
+            display: block;
+            background: #eef2ff;
+            border: 2px dashed var(--primary);
+            color: #1e3a8a;
+            padding: 16px;
+            text-align: center;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            margin-bottom: 12px;
+        }
+        .file-upload-label:hover { background: #e0e7ff; }
+
+        .doc-item { background: #fafafa; border-left: 5px solid var(--primary); padding: 12px; margin-top: 12px; border-radius: 6px; font-size: 0.95rem; }
+        .doc-item p { margin: 6px 0; word-break: break-word; }
+        
+        .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        
+        .lang-btn { 
+            background: rgba(255, 255, 255, 0.2); 
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            width: auto; 
+            padding: 6px 14px; 
+            font-size: 0.85rem; 
+            margin: 0; 
+            border-radius: 20px;
+            backdrop-filter: blur(4px);
+            font-weight: 600;
+        }
+        .lang-btn:hover { background: rgba(255, 255, 255, 0.3); }
+
+        .hidden { display: none !important; }
+        .actions-group { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+        .action-btn { background: #64748b; width: auto; padding: 6px 10px; font-size: 0.85rem; margin: 0; flex: 1; }
+        .action-btn:hover { background: #475569; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center;
+            z-index: 1000;
+        }
+        .modal-card {
+            background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 400px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body class="login-background" id="bodyTag">
+
+    <div class="container">
+        <!-- CABECERA Y IDIOMA RESPONSIVE -->
+        <div class="header-flex">
+            <h1 id="ui-title" style="color: white; margin: 0;">🔵 HomeVault</h1>
+            <button class="lang-btn" onclick="toggleIdioma()" id="btnLang">🌐 Deutsch / Español</button>
+        </div>
+
+        <!-- PANTALLA DE LOGIN SEGURA Y COMPACTA -->
+        <div class="card" id="loginCard">
+            <h3 id="ui-login-title" style="text-align: center; margin-bottom: 5px;">Anmelden</h3>
+            <input type="password" id="pinInput" placeholder="PIN eingeben" inputmode="numeric" pattern="[0-9]*" style="text-align: center; font-size: 1.2rem; letter-spacing: 3px;">
+            <button onclick="verificarPin()" id="ui-login-btn">Einloggen</button>
+            <p id="errorLogin" style="color: red; display: none; font-size: 0.85rem; text-align: center; margin-top: 8px;"></p>
+        </div>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div id="mainContent" class="hidden">
+            
+            <!-- CAMINO 1: NUEVO DOCUMENTO -->
+            <div class="card section-path-green">
+                <h3 id="ui-path1-title">1️⃣ Neues Dokument hinzufügen</h3>
+                
+                <label for="fileInput" class="file-upload-label" id="ui-file-label">
+                    📷 📁 Dokument scannen oder Datei hochladen
+                </label>
+                <input type="file" id="fileInput" accept="image/*,application/pdf" capture="environment" style="display: none;" onchange="actualizarNombreArchivo(this)">
+                <p id="fileNameDisplay" style="font-size: 0.85rem; color: #666; margin-top: -4px; margin-bottom: 12px; font-style: italic;"></p>
+
+                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                    <label id="ui-format-label" style="font-size: 0.85rem; font-weight: bold; color: #555; width: 100px; margin:0;">Format:</label>
+                    <select id="formatSelect" style="margin: 0; padding: 8px;">
+                        <option value="jpg">JPG (Standard)</option>
+                        <option value="pdf">PDF</option>
+                    </select>
+                </div>
+
+                <label id="ui-cat-label" style="font-size: 0.9rem; font-weight: bold; color: #555;">Kategorie wählen:</label>
+                <select id="categorySelect" onchange="verificarOpcionCategoria(this)">
+                </select>
+
+                <textarea id="commentInput" placeholder="Kommentar (optional)..." rows="2"></textarea>
+                <button class="btn-green" onclick="guardarLocalmente()" id="ui-save-btn">Auf dem Handy speichern</button>
+            </div>
+
+            <!-- CAMINO 2: VER DOCUMENTOS Y SINCRONIZAR -->
+            <div class="card section-path">
+                <h3 id="ui-path2-title">2️⃣ Dokumente verwalten & PC</h3>
+                <p id="ui-path2-desc" style="font-size: 0.9rem; color: #666;">Sehen, drucken, löschen oder an den PC senden.</p>
+                
+                <div style="margin-top: 15px;">
+                    <button class="btn-orange" onclick="sincronizarConPC()" id="ui-sync-btn">🔄 Mit PC synchronisieren</button>
+                </div>
+
+                <div id="listaDocs" style="margin-top: 15px;"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- VENTANA POPUP MODAL PARA CREAR CATEGORÍA / SUBCATEGORÍA -->
+    <div id="categoryModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3 id="modalTitle">Kategorie / Unterkategorie erstellen</h3>
+            
+            <label style="font-size: 0.85rem; font-weight: bold;" id="modalTypeLabel">Art der Erstellung:</label>
+            <select id="modalCreationType" onchange="cambiarModoModal()">
+                <option value="main" id="optMain">📁 Neue Hauptkategorie (Hauptordner)</option>
+                <option value="sub" id="optSub">📂 Unterkategorie zu bestehender</option>
+            </select>
+
+            <div id="parentCategoryGroup" class="hidden" style="margin-top: 10px;">
+                <label style="font-size: 0.85rem; font-weight: bold;" id="modalParentLabel">Hauptkategorie wählen:</label>
+                <select id="modalParentSelect"></select>
+            </div>
+
+            <div style="margin-top: 10px;">
+                <label style="font-size: 0.85rem; font-weight: bold;" id="modalNameLabel">Name:</label>
+                <input type="text" id="modalInputName" placeholder="Ej: Rechnungen_2026">
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button style="background: #95a5a6; margin-top:0;" onclick="cerrarModalCategoria()" id="modalBtnCancel">Abbrechen</button>
+                <button style="background: var(--primary); margin-top:0;" onclick="guardarNuevaCategoriaModal()" id="modalBtnSave">Erstellen</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
